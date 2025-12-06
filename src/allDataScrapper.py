@@ -25,7 +25,12 @@ def getData(company):
     response = requests.get(historyUrl, headers=headers, params=params, cookies=cookies)
 
     # get total number of data available
-    totalRecords = response.json()["recordsTotal"]
+    response_json = response.json()
+    if "recordsTotal" in response_json:
+        totalRecords = response_json["recordsTotal"]
+    else:
+        print(f"Key 'recordsTotal' not found in response for {company}:", response_json)
+        totalRecords = 0  # or handle as needed
 
     # set the start to 1 and total size of data to 50
     start = 1
