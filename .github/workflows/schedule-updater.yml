@@ -21,7 +21,8 @@ jobs:
       - name: Run updater
         run: python allDataScrapper.py
       - name: Merge all company datasets
-        run: python merge_companies.py
+        run: python src/merge_companies.py
+        working-directory: ${{ github.workspace }}
       - name: Setup Git
         run: git config --local user.email "${{ github.actor }}@users.noreply.github.com" && git config --local user.name "${{ github.actor }}"
       - name: Commit Files
