@@ -2,15 +2,17 @@
 import requests
 import pandas as pd
 from pathlib import Path
-from config.cookies import cookies
 from config.headers import headers
 from constants.url import historyUrl
 from constants.companyIdMap import companyIdMap
 from utils.params import getParams
 from utils.flatten import flatten
+import urllib.parse
 
 
-def getData(company):
+
+
+def getData(company, session, base_headers):
     # get company symbol
     companySymbol = companyIdMap[company]
 
@@ -21,8 +23,17 @@ def getData(company):
     # set params for API, (set size = 1, for start to get the total size of data)
     params = getParams(1, 1, companySymbol)
 
-    # request API to get data
-    response = requests.get(historyUrl, headers=headers, params=params, cookies=cookies)
+    # Get fresh CSRF token from session cookies
+    csrf_token = session.cookies.get('XSRF-TOKEN')
+    csrf_token = urllib.parse.unquote(csrf_token)
+    local_headers = base_headers.copy()
+    if csrf_token:
+        local_headers['X-XSRF-TOKEN'] = csrf_token
+
+    # request API to get data (POST instead of GET)
+    response = session.post(historyUrl, headers=local_headers, data=params)
+    print(f"[DEBUG] Response status code for {company}: {response.status_code}")
+    print(f"[DEBUG] Response text for {company}: {response.text}")
 
     # get total number of data available
     response_json = response.json()
@@ -45,8 +56,8 @@ def getData(company):
     # loop
     for i in range(1, totalLoop):
         dataParams = getParams(start, size, companySymbol)
-        response = requests.get(historyUrl, headers=headers, params=dataParams, cookies=cookies)
-        data.append(response.json()["data"])
+        response = session.post(historyUrl, headers=local_headers, data=dataParams)
+        data.append(response.json().get("data", []))
         start = start + 50
 
     # flat the 2d data to 1d array
@@ -55,8 +66,9 @@ def getData(company):
     # convert to dataframe and save to csv in reverse order
     df = pd.DataFrame.from_dict(dataArray)[::-1]
 
-    # remove unwanted column DT_Row_Index
-    df = df.drop(columns="DT_Row_Index")
+    # remove unwanted column DT_Row_Index if present
+    if "DT_Row_Index" in df.columns:
+        df = df.drop(columns="DT_Row_Index")
 
     # save to file
     fileName = f"../data/company-wise/{company}.csv"
@@ -69,5 +81,11 @@ def getData(company):
     print(f"Collection completed of {company}...")
 
 
-for company in companyIdMap:
-    getData(company)
+if __name__ == "__main__":
+    import time
+    session = requests.Session()
+    # GET request to main page to get fresh cookies and CSRF token
+    session.get('https://www.sharesansar.com', headers=headers)
+    for company in companyIdMap:
+        getData(company, session, headers)
+        time.sleep(1)  # Add a small delay to avoid rate limiting
