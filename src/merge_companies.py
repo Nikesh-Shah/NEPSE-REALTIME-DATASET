@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def merge_company_csvs(input_folder="d:/projects/nepse-data/data/company-wise/", output_file="d:/projects/nepse-data/data/all_companies.csv"):
+def merge_company_csvs(input_folder="data/company-wise/", output_file="data/all_companies.csv"):
     all_files = [f for f in os.listdir(input_folder) if f.endswith(".csv")]
     dfs = []
     for f in all_files:
