@@ -36,6 +36,17 @@ dataTable = tables[0]
 
 fileDir = Path("../data/company-wise/")
 from constants.columns import columns as required_columns
+from constants.companyIdMap import companyIdMap
+
+# Ensure CSV files exist for all companies in companyIdMap
+fileDir.mkdir(parents=True, exist_ok=True)
+for company in companyIdMap:
+    csv_file = fileDir / f"{company}.csv"
+    if not csv_file.exists():
+        # Create empty CSV with headers for new companies
+        df_empty = pd.DataFrame(columns=required_columns[:9])
+        df_empty.to_csv(csv_file, index=False)
+        print(f"[INFO] Created new CSV file for {company}")
 
 for file in fileDir.glob("*.csv"):
     # Check if the CSV is empty
