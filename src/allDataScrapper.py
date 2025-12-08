@@ -43,6 +43,12 @@ def getData(company, session, base_headers):
         print(f"Key 'recordsTotal' not found in response for {company}:", response_json)
         totalRecords = 0  # or handle as needed
 
+    # Check if company has no historical data (new company)
+    if totalRecords == 0:
+        print(f"[INFO] No historical data available for {company} (possibly a new company). Skipping...")
+        print(".........")
+        return
+
     # set the start to 1 and total size of data to 50
     start = 1
     size = 50
@@ -65,6 +71,12 @@ def getData(company, session, base_headers):
 
     # convert to dataframe and save to csv in reverse order
     df = pd.DataFrame.from_dict(dataArray)[::-1]
+
+    # Check if dataframe is empty
+    if df.empty:
+        print(f"[INFO] No data collected for {company}. Skipping file creation...")
+        print(".........")
+        return
 
     # remove unwanted column DT_Row_Index if present
     if "DT_Row_Index" in df.columns:

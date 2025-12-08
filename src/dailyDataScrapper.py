@@ -59,6 +59,12 @@ for file in fileDir.glob("*.csv"):
     print(f"[DEBUG] Symbol to match: {symbol}")
     data = dataTable.loc[dataTable["Symbol"] == symbol]
     print(f"[DEBUG] Data found for symbol: {not data.empty}, Rows: {len(data)}")
+    
+    # Skip if no data found (company might be new or not traded today)
+    if data.empty or len(data) == 0:
+        print(f"[INFO] No trading data available for {symbol} today. Skipping...")
+        continue
+    
     if len(data) == 1:
         open_ = float(data["Open"].iloc[0])
         close_ = float(data["Close"].iloc[0])
