@@ -19,7 +19,7 @@ jobs:
       - name: Install packages
         run: pip install -r requirements.txt
       - name: Run updater
-        run: python allDataScrapper.py
+        run: python dailyDataScrapper.py
       - name: Merge all company datasets
         run: python src/merge_companies.py
         working-directory: ${{ github.workspace }}
