@@ -40,17 +40,17 @@ for file in fileDir.glob("*.csv"):
         print(f"Checking symbol: {symbol}")
         print(f"Available symbols in table: {list(dataTable['Symbol'])[:10]}")
         if len(data) == 1:
-            status = getStatus(float(data["Open"]), float(data["Close"]))
+            status = getStatus(float(data["Open"].iloc[0]), float(data["Close"].iloc[0]))
             dataRow = [
                 [
                     today,
-                    float(data["Open"]),
-                    float(data["High"]),
-                    float(data["Low"]),
-                    float(data["Close"]),
-                    float(data["Diff %"]),
-                    float(data["Vol"]),
-                    float(data["Turnover"]),
+                    float(data["Open"].iloc[0]),
+                    float(data["High"].iloc[0]),
+                    float(data["Low"].iloc[0]),
+                    float(data["Close"].iloc[0]),
+                    float(data["Diff %"].iloc[0]),
+                    float(data["Vol"].iloc[0]),
+                    float(data["Turnover"].iloc[0]),
                     status,
                 ]
             ]
