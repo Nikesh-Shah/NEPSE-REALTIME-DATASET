@@ -35,8 +35,10 @@ for file in fileDir.glob("*.csv"):
     lastRow = existingDf.iloc[-1]
     lastDate = lastRow["published_date"]
     if str(lastDate) != str(today):
-        symbol = str(file).split(".")[2].split("/")[-1]
+        symbol = file.stem
         data = dataTable.loc[dataTable["Symbol"] == symbol]
+        print(f"Checking symbol: {symbol}")
+        print(f"Available symbols in table: {list(dataTable['Symbol'])[:10]}")
         if len(data) == 1:
             status = getStatus(float(data["Open"]), float(data["Close"]))
             dataRow = [
