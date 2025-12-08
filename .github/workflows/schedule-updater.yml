@@ -25,8 +25,20 @@ jobs:
         working-directory: ${{ github.workspace }}
       - name: Setup Git
         run: git config --local user.email "${{ github.actor }}@users.noreply.github.com" && git config --local user.name "${{ github.actor }}"
+      - name: Generate dynamic commit message
+        id: commitmsg
+        run: |
+          msg="Updated realtime data"
+          if git status --porcelain | grep -q '?? data/company-wise/'; then
+            new_files=$(git status --porcelain | grep '?? data/company-wise/' | wc -l)
+            msg="Added $new_files new company CSV file(s)"
+          elif [ -n "$(git diff --cached ../data)" ]; then
+            msg="Updated company data - $(date +'%Y-%m-%d %H:%M NPT')"
+          fi
+          echo "msg=$msg" >> $GITHUB_OUTPUT
+        working-directory: ${{ github.workspace }}
       - name: Commit Files
-        run: git stage ../data && git commit -m "Updated realtime data"
+        run: git stage ../data && git commit -m "${{ steps.commitmsg.outputs.msg }}" || echo "No changes to commit"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
