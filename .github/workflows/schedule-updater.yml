@@ -1,8 +1,8 @@
 name: update-companies-data
 on:
   schedule:
-    # Runs "at 18:45 (Nepal Time), every Monday to Friday
-    - cron: "0 13,14,15,16,17 * * 0,1,2,3,4,5"
+    # Runs every hour from 3:15 PM to 10:15 PM Nepal Time (9:30 to 16:30 UTC), Sunday to Friday
+    - cron: "30 9,10,11,12,13,14,15,16 * * 0-5"
   workflow_dispatch:
 defaults:
   run:
