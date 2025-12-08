@@ -41,12 +41,14 @@ from constants.companyIdMap import companyIdMap
 # Ensure CSV files exist for all companies in companyIdMap
 fileDir.mkdir(parents=True, exist_ok=True)
 for company in companyIdMap:
-    csv_file = fileDir / f"{company}.csv"
+    # Sanitize filename by replacing invalid characters
+    safe_filename = company.replace("/", "-").replace("\\", "-")
+    csv_file = fileDir / f"{safe_filename}.csv"
     if not csv_file.exists():
         # Create empty CSV with headers for new companies
         df_empty = pd.DataFrame(columns=required_columns[:9])
         df_empty.to_csv(csv_file, index=False)
-        print(f"[INFO] Created new CSV file for {company}")
+        print(f"[INFO] Created new CSV file for {company} as {safe_filename}.csv")
 
 for file in fileDir.glob("*.csv"):
     # Check if the CSV is empty
