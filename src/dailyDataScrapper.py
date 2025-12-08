@@ -20,9 +20,18 @@ tables = pd.read_html(html)
 dataTable = tables[0]
 
 fileDir = Path("../data/company-wise/")
+import pandas.errors
+
 for file in fileDir.glob("*.csv"):
+    if file.stat().st_size == 0:
+        print(f"[EMPTY] {file}")
+        continue
+    try:
+        existingDf = pd.read_csv(file)
+    except pandas.errors.EmptyDataError:
+        print(f"[EMPTY DATA] {file}")
+        continue
     # first check if data already exist for this date
-    existingDf = pd.read_csv(file)
     lastRow = existingDf.iloc[-1]
     lastDate = lastRow["published_date"]
     if str(lastDate) != str(today):
@@ -45,3 +54,4 @@ for file in fileDir.glob("*.csv"):
             ]
             dataframe = pd.DataFrame(dataRow)
             dataframe.to_csv(file, mode="a", header=False, index=False)
+            print(f"[UPDATED] {file} with today's data.")
